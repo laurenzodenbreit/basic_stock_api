@@ -16,7 +16,24 @@ const stockSites = [
 
 // home route
 app.get('/', (req, res) => {
-  res.json('Welcome to my Stock ticker API')
+  const welcome = {
+    hello: 'user',
+    endpoints: [
+      {
+        currencySymbols: 'get all currency symbols:',
+        route: '/currency-symbols'
+      },
+      {
+        currencyExchangeRate: 'get exchange rate for two currencies',
+        route: '/currency-exchange-rate?currency=usd&to=eur'
+      },
+      {
+        convertCurrency: 'convert amount of start currency to another currency',
+        route: '/convert-currency?currency=usd&to=eur&amount=10'
+      }
+    ]
+  }
+  res.json(welcome)
 })
 
 // currency symbol route 
