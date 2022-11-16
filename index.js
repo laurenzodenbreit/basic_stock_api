@@ -21,6 +21,10 @@ app.get('/', (req, res) => {
     hello: 'user',
     endpoints: [
       {
+        stockTicker: 'get metrics for stock using stock symbol',
+        route: '/stocks/aapl'
+      },
+      {
         currencySymbols: 'get all currency symbols:',
         route: '/currency-symbols'
       },
