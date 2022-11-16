@@ -16,6 +16,7 @@ const stockSites = [
 
 // home route
 app.get('/', (req, res) => {
+  // welcome page for home rout
   const welcome = {
     hello: 'user',
     endpoints: [
@@ -119,7 +120,6 @@ app.get('/stocks/:stockId', (req, res) => {
           let price = $("*[data-field='regularMarketPrice']").last().attr("value");
           let priceChange = $("*[data-field='regularMarketChange']").last().attr("value");
           let priceChangePercent = $("*[data-field='regularMarketChangePercent']").last().attr("value");
-
           // get other data from table
           let tableData = [];
           let previousClose = $("*[data-test='PREV_CLOSE-value']").text();
