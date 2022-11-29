@@ -2,7 +2,7 @@
 This API allows users to receive basic financial information on stocks, indizes and currencies
 
 ## endpoints
-## stocks
+### stocks
 **route**: 'stocks/aapl'
 retrieve stock data through its symbol
 
