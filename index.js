@@ -2,7 +2,6 @@ const PORT = process.env.PORT || 8000
 const express = require('express')
 const axios = require('axios')
 const cheerio = require('cheerio')
-const { first } = require('cheerio/lib/api/traversing')
 
 // initialize express as new app
 const app = express()
@@ -26,7 +25,7 @@ app.get('/', (req, res) => {
         route: '/stocks/aapl'
       },
       {
-        indexTicker: 'get metrics for indizes using symbol',
+        indexTicker: 'get metrics for index funds using symbol',
         route: '/indizes/gspc'
       },
       {
@@ -110,72 +109,48 @@ app.get('/convert-currency', (req, res) => {
 // index symbol route 
 // gets ticker for specific index though symbol 
 app.get('/indizes/:indexId', (req, res) => {
-  // index symbol for search
   const symbol = '^' + req.params.indexId.toUpperCase()
+    // index symbol for search
   const searchSymbol = '%5E' + req.params.indexId.toUpperCase()
-  // get data from symbol
   // get site details from array
   const site = stockSites.filter(site => site.name == 'yahoo')[0]
   // webaddress for content scraper
   const indexAddress = site.url + site.path + searchSymbol
   axios.get(indexAddress)
-   .then(response => {
-    // load html of site
-    const html = response.data
-    const $ = cheerio.load(html)
-    let data = {}
-    let components = [];
-    // get name of index
-    const name = $("h1").text()
-    // get price of index
-    let price = $("*[data-field='regularMarketPrice']").last().attr("value");
-    let priceChange = $("*[data-field='regularMarketChange']").last().attr("value");
-    let priceChangePercent = $("*[data-field='regularMarketChangePercent']").last().attr("value");
-    // get more data
-    let previousClose = $("*[data-test='PREV_CLOSE-value']").text();
-    let open = $("*[data-test='OPEN-value']").text();
-    let dayRange = $("*[data-test='DAYS_RANGE-value']").text();
-    let yearRange = $("*[data-test='FIFTY_TWO_WK_RANGE-value']").text();
-    // push data from table to data array
-    let tableRowData = {
-      previousClose: previousClose,
-      open: open,
-      dayRange: dayRange,
-      yearRange: yearRange,
-    };
-    // get individual components for index
-    axios.get(indexAddress + '/components')
-      .then(response => {
-        // load html of site
-        const html = response.data
-        const $ = cheerio.load(html)
-        // get all table rows
-        let tr = $("tr");
-        tr.each(tr => {
-          let componentSymbol = $(tr).children().first().text();
-          let componentName = $(tr).children("td:nth-child(2)").text();
-          let component = {
-            componentName: componentName,
-            componentSymbol: componentSymbol
-          }
-          console.log(component)
-          components.push(component);
-        })
-      })
-    // push results to data array
-    data = {
-      name: name,
-      symbol: symbol,
-      price: price,
-      priceChange: priceChange,
-      priceChangePercent: priceChangePercent,
-      more: tableRowData,
-      components: components
-    }
-    // respond to user with data array
-    res.json(data)
-   }).catch(err => console.log(err))
+    .then(response => {
+      // load html of site
+      const html = response.data
+      const $ = cheerio.load(html)        
+      // get name of index
+      const name = $("h1").text()
+      // get price of index
+      let price = $("*[data-field='regularMarketPrice']").last().attr("value");
+      let priceChange = $("*[data-field='regularMarketChange']").last().attr("value");
+      let priceChangePercent = $("*[data-field='regularMarketChangePercent']").last().attr("value");
+      // get other data from table
+      let previousClose = $("*[data-test='PREV_CLOSE-value']").text();
+      let open = $("*[data-test='OPEN-value']").text();
+      let dayRange = $("*[data-test='DAYS_RANGE-value']").text();
+      let yearRange = $("*[data-test='FIFTY_TWO_WK_RANGE-value']").text();
+      indexRes = {
+        name,
+        symbol,
+        price,
+        priceChange,
+        priceChangePercent,
+        more: {
+          previousClose,
+          open,
+          dayRange,
+          yearRange,
+        },
+        components: []
+      }
+      // respond to user with data object
+      res.json(indexRes)
+    }).catch(err => console.log(err))
 })
+
 
 // stock symbol route
 // gets ticker for specific stock through symbol
@@ -200,14 +175,13 @@ app.get('/stocks/:stockId', (req, res) => {
           let priceChange = $("*[data-field='regularMarketChange']").last().attr("value");
           let priceChangePercent = $("*[data-field='regularMarketChangePercent']").last().attr("value");
           // get other data from table
-          let tableData = [];
           let previousClose = $("*[data-test='PREV_CLOSE-value']").text();
           let open = $("*[data-test='OPEN-value']").text();
           let dayRange = $("*[data-test='DAYS_RANGE-value']").text();
           let yearRange = $("*[data-test='FIFTY_TWO_WK_RANGE-value']").text();
           let marketCap = $("*[data-test='MARKET_CAP-value']").text();
           let earningsDate = $("*[data-test='EARNINGS_DATE-value']").text();
-          let oneYearTarget = $("*[data-test='ONE_YEAR_TARGET_PRICE-value']").text();
+          let oneYearTarget = $("*[data-test='ONE_YEAR_TARGET_PRICE-value']").text()
           // push data from table to data array
           const tableRowData = {
             previousClose: previousClose,
@@ -218,8 +192,7 @@ app.get('/stocks/:stockId', (req, res) => {
             earningsDate: earningsDate,
             oneYearTarget: oneYearTarget
           };
-          tableData.push(tableRowData);
-          // push results to data array
+          // push results to data object
           data = {
             name: name,
             symbol: symbol,
