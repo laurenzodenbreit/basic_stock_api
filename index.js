@@ -143,8 +143,7 @@ app.get('/indizes/:indexId', (req, res) => {
           open,
           dayRange,
           yearRange,
-        },
-        components: []
+        }
       }
       // respond to user with data object
       res.json(indexRes)
@@ -185,20 +184,20 @@ app.get('/stocks/:stockId', (req, res) => {
           // push data from table to data array
           const tableRowData = {
             previousClose: previousClose,
-            open: open,
-            dayRange: dayRange,
-            yearRange: yearRange,
-            marketCap: marketCap,
-            earningsDate: earningsDate,
-            oneYearTarget: oneYearTarget
+            open,
+            dayRange,
+            yearRange,
+            marketCap,
+            earningsDate,
+            oneYearTarget
           };
           // push results to data object
           data = {
-            name: name,
-            symbol: symbol,
-            price: price,
-            priceChange: priceChange,
-            priceChangePercent: priceChangePercent,
+            name,
+            symbol,
+            price,
+            priceChange,
+            priceChangePercent,
             more: tableRowData
           }
           // respond to user with data array
