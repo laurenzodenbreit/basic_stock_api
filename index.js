@@ -25,6 +25,10 @@ app.get('/', (req, res) => {
         route: '/stocks/aapl'
       },
       {
+        indexTicker: 'get metrics for index funds using symbol',
+        route: '/indizes/gspc'
+      },
+      {
         currencySymbols: 'get all currency symbols:',
         route: '/currency-symbols'
       },
@@ -102,6 +106,53 @@ app.get('/convert-currency', (req, res) => {
   })
 })
 
+// index symbol route 
+// gets ticker for specific index though symbol 
+app.get('/indizes/:indexId', (req, res) => {
+  const symbol = '^' + req.params.indexId.toUpperCase()
+    // index symbol for search
+  const searchSymbol = '%5E' + req.params.indexId.toUpperCase()
+  // get site details from array
+  const site = stockSites.filter(site => site.name == 'yahoo')[0]
+  // webaddress for content scraper
+  const indexAddress = site.url + site.path + searchSymbol
+  axios.get(indexAddress)
+    .then(response => {
+      // load html of site
+      const html = response.data
+      const $ = cheerio.load(html)        
+      // get name of index
+      const name = $("h1").text()
+      // get price of index
+      let price = $("*[data-field='regularMarketPrice']").last().attr("value");
+      let priceChange = $("*[data-field='regularMarketChange']").last().attr("value");
+      let priceChangePercent = $("*[data-field='regularMarketChangePercent']").last().attr("value");
+      // get other data from table
+      let previousClose = $("*[data-test='PREV_CLOSE-value']").text();
+      let open = $("*[data-test='OPEN-value']").text();
+      let dayRange = $("*[data-test='DAYS_RANGE-value']").text();
+      let yearRange = $("*[data-test='FIFTY_TWO_WK_RANGE-value']").text();
+      indexRes = [
+        {
+          name,
+          symbol,
+          price,
+          priceChange,
+          priceChangePercent,
+          more: {
+            previousClose,
+            open,
+            dayRange,
+            yearRange,
+          }
+        }
+      ]
+      // respond to user with data object
+      res.json(indexRes)
+    }).catch(err => console.log(err))
+})
+
+
 // stock symbol route
 // gets ticker for specific stock through symbol
 app.get('/stocks/:stockId', (req, res) => {
@@ -125,7 +176,6 @@ app.get('/stocks/:stockId', (req, res) => {
           let priceChange = $("*[data-field='regularMarketChange']").last().attr("value");
           let priceChangePercent = $("*[data-field='regularMarketChangePercent']").last().attr("value");
           // get other data from table
-          let tableData = [];
           let previousClose = $("*[data-test='PREV_CLOSE-value']").text();
           let open = $("*[data-test='OPEN-value']").text();
           let dayRange = $("*[data-test='DAYS_RANGE-value']").text();
@@ -136,23 +186,24 @@ app.get('/stocks/:stockId', (req, res) => {
           // push data from table to data array
           const tableRowData = {
             previousClose: previousClose,
-            open: open,
-            dayRange: dayRange,
-            yearRange: yearRange,
-            marketCap: marketCap,
-            earningsDate: earningsDate,
-            oneYearTarget: oneYearTarget
+            open,
+            dayRange,
+            yearRange,
+            marketCap,
+            earningsDate,
+            oneYearTarget
           };
-          tableData.push(tableRowData);
-          // push results to data array
-          data = {
-            name: name,
-            symbol: symbol,
-            price: price,
-            priceChange: priceChange,
-            priceChangePercent: priceChangePercent,
-            more: tableRowData
-          }
+          // push results to data object
+          data = [
+            {
+              name,
+              symbol,
+              price,
+              priceChange,
+              priceChangePercent,
+              more: tableRowData
+            }
+          ]
           // respond to user with data array
           res.json(data)
       }).catch(err => console.log(err))
