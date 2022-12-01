@@ -132,18 +132,20 @@ app.get('/indizes/:indexId', (req, res) => {
       let open = $("*[data-test='OPEN-value']").text();
       let dayRange = $("*[data-test='DAYS_RANGE-value']").text();
       let yearRange = $("*[data-test='FIFTY_TWO_WK_RANGE-value']").text();
-      indexRes = {
-        name,
-        symbol,
-        price,
-        priceChange,
-        priceChangePercent,
-        more: {
-          previousClose,
-          open,
-          dayRange,
-          yearRange,
-        }
+      indexRes = [
+          {
+          name,
+          symbol,
+          price,
+          priceChange,
+          priceChangePercent,
+          more: {
+            previousClose,
+            open,
+            dayRange,
+            yearRange,
+          }
+        ]
       }
       // respond to user with data object
       res.json(indexRes)
@@ -192,14 +194,16 @@ app.get('/stocks/:stockId', (req, res) => {
             oneYearTarget
           };
           // push results to data object
-          data = {
-            name,
-            symbol,
-            price,
-            priceChange,
-            priceChangePercent,
-            more: tableRowData
-          }
+          data = [
+            {
+              name,
+              symbol,
+              price,
+              priceChange,
+              priceChangePercent,
+              more: tableRowData
+            }
+          ]
           // respond to user with data array
           res.json(data)
       }).catch(err => console.log(err))
