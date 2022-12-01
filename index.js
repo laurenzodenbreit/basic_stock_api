@@ -122,7 +122,8 @@ app.get('/indizes/:indexId', (req, res) => {
       const html = response.data
       const $ = cheerio.load(html)        
       // get name of index
-      const name = $("h1").text()
+      const rawName = $("h1").text()
+      const name = rawName.split(' (')[0]
       // get price of index
       let price = Number($("*[data-field='regularMarketPrice']").last().attr("value"));
       let priceChange = Number($("*[data-field='regularMarketChange']").last().attr("value"));
@@ -170,7 +171,8 @@ app.get('/stocks/:stockId', (req, res) => {
           const $ = cheerio.load(html)
           let data = {}
           // get name of stock
-          const name = $("h1").text()
+          const rawName = $("h1").text()
+          const name = rawName.split(' (')[0]
           // get price of stock
           let price = Number($("*[data-field='regularMarketPrice']").last().attr("value"));
           let priceChange = Number($("*[data-field='regularMarketChange']").last().attr("value"));
