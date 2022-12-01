@@ -124,16 +124,16 @@ app.get('/indizes/:indexId', (req, res) => {
       // get name of index
       const name = $("h1").text()
       // get price of index
-      let price = $("*[data-field='regularMarketPrice']").last().attr("value");
-      let priceChange = $("*[data-field='regularMarketChange']").last().attr("value");
-      let priceChangePercent = $("*[data-field='regularMarketChangePercent']").last().attr("value");
+      let price = Number($("*[data-field='regularMarketPrice']").last().attr("value"));
+      let priceChange = Number($("*[data-field='regularMarketChange']").last().attr("value"));
+      let priceChangePercent = Number($("*[data-field='regularMarketChangePercent']").last().attr("value"));
       // get other data from table
-      let previousClose = $("*[data-test='PREV_CLOSE-value']").text();
-      let open = $("*[data-test='OPEN-value']").text();
+      let previousClose = Number($("*[data-test='PREV_CLOSE-value']").text());
+      let open = Number($("*[data-test='OPEN-value']").text());
       let dayRange = $("*[data-test='DAYS_RANGE-value']").text();
       let yearRange = $("*[data-test='FIFTY_TWO_WK_RANGE-value']").text();
       indexRes = [
-          {
+        {
           name,
           symbol,
           price,
@@ -145,8 +145,8 @@ app.get('/indizes/:indexId', (req, res) => {
             dayRange,
             yearRange,
           }
-        ]
-      }
+        }
+      ]
       // respond to user with data object
       res.json(indexRes)
     }).catch(err => console.log(err))
@@ -172,17 +172,17 @@ app.get('/stocks/:stockId', (req, res) => {
           // get name of stock
           const name = $("h1").text()
           // get price of stock
-          let price = $("*[data-field='regularMarketPrice']").last().attr("value");
-          let priceChange = $("*[data-field='regularMarketChange']").last().attr("value");
-          let priceChangePercent = $("*[data-field='regularMarketChangePercent']").last().attr("value");
+          let price = Number($("*[data-field='regularMarketPrice']").last().attr("value"));
+          let priceChange = Number($("*[data-field='regularMarketChange']").last().attr("value"));
+          let priceChangePercent = Number($("*[data-field='regularMarketChangePercent']").last().attr("value"));
           // get other data from table
-          let previousClose = $("*[data-test='PREV_CLOSE-value']").text();
-          let open = $("*[data-test='OPEN-value']").text();
+          let previousClose = Number($("*[data-test='PREV_CLOSE-value']").text());
+          let open = Number($("*[data-test='OPEN-value']").text());
           let dayRange = $("*[data-test='DAYS_RANGE-value']").text();
           let yearRange = $("*[data-test='FIFTY_TWO_WK_RANGE-value']").text();
           let marketCap = $("*[data-test='MARKET_CAP-value']").text();
           let earningsDate = $("*[data-test='EARNINGS_DATE-value']").text();
-          let oneYearTarget = $("*[data-test='ONE_YEAR_TARGET_PRICE-value']").text()
+          let oneYearTarget = Number($("*[data-test='ONE_YEAR_TARGET_PRICE-value']").text());
           // push data from table to data array
           const tableRowData = {
             previousClose: previousClose,
