@@ -203,7 +203,7 @@ app.get('/stocks/:stockId', (req, res) => {
               priceChange,
               priceChangePercent,
               more: {
-                previousClose: previousClose,
+                previousClose,
                 open,
                 todayLow,
                 todayHigh,
