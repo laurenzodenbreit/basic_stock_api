@@ -122,17 +122,20 @@ app.get('/indizes/:indexId', (req, res) => {
       const html = response.data
       const $ = cheerio.load(html)        
       // get name of index
-      const rawName = $("h1").text()
-      const name = rawName.split(' (')[0]
+      const name = $("h1").text()
       // get price of index
-      let price = Number($("*[data-field='regularMarketPrice']").last().attr("value"));
-      let priceChange = Number($("*[data-field='regularMarketChange']").last().attr("value"));
-      let priceChangePercent = Number($("*[data-field='regularMarketChangePercent']").last().attr("value"));
+      let price = Number($("*[data-field='regularMarketPrice']").last().attr("value").replace(',', ''));
+      let priceChange = Number($("*[data-field='regularMarketChange']").last().attr("value").replace(',', ''));
+      let priceChangePercent = Number($("*[data-field='regularMarketChangePercent']").last().attr("value").replace(',', ''));
       // get other data from table
-      let previousClose = Number($("*[data-test='PREV_CLOSE-value']").text());
-      let open = Number($("*[data-test='OPEN-value']").text());
+      let previousClose = Number($("*[data-test='PREV_CLOSE-value']").text().replace(',', ''));
+      let open = Number($("*[data-test='OPEN-value']").text().replace(',', ''));
       let dayRange = $("*[data-test='DAYS_RANGE-value']").text();
+      let todayLow = Number(dayRange.split(' -')[0].replace(',', ''))
+      let todayHigh = Number(dayRange.split('- ')[1].replace(',', ''))
       let yearRange = $("*[data-test='FIFTY_TWO_WK_RANGE-value']").text();
+      let yearLow = Number(yearRange.split(' -')[0].replace(',', ''))
+      let yearHigh = Number(yearRange.split('- ')[1].replace(',', ''))
       indexRes = [
         {
           name,
@@ -143,8 +146,10 @@ app.get('/indizes/:indexId', (req, res) => {
           more: {
             previousClose,
             open,
-            dayRange,
-            yearRange,
+            todayLow,
+            todayHigh,
+            yearLow,
+            yearHigh,
           }
         }
       ]
@@ -174,27 +179,21 @@ app.get('/stocks/:stockId', (req, res) => {
           const rawName = $("h1").text()
           const name = rawName.split(' (')[0]
           // get price of stock
-          let price = Number($("*[data-field='regularMarketPrice']").last().attr("value"));
-          let priceChange = Number($("*[data-field='regularMarketChange']").last().attr("value"));
-          let priceChangePercent = Number($("*[data-field='regularMarketChangePercent']").last().attr("value"));
+          let price = Number($("*[data-field='regularMarketPrice']").last().attr("value").replace(',', ''));
+          let priceChange = Number($("*[data-field='regularMarketChange']").last().attr("value").replace(',', ''));
+          let priceChangePercent = Number($("*[data-field='regularMarketChangePercent']").last().attr("value").replace(',', ''));
           // get other data from table
-          let previousClose = Number($("*[data-test='PREV_CLOSE-value']").text());
-          let open = Number($("*[data-test='OPEN-value']").text());
+          let previousClose = Number($("*[data-test='PREV_CLOSE-value']").text().replace(',', ''));
+          let open = Number($("*[data-test='OPEN-value']").text().replace(',', ''));
           let dayRange = $("*[data-test='DAYS_RANGE-value']").text();
+          let todayLow = Number(dayRange.split(' -')[0].replace(',', ''))
+          let todayHigh = Number(dayRange.split('- ')[1].replace(',', ''))
           let yearRange = $("*[data-test='FIFTY_TWO_WK_RANGE-value']").text();
+          let yearLow = Number(yearRange.split(' -')[0].replace(',', ''))
+          let yearHigh = Number(yearRange.split('- ')[1].replace(',', ''))
           let marketCap = $("*[data-test='MARKET_CAP-value']").text();
           let earningsDate = $("*[data-test='EARNINGS_DATE-value']").text();
-          let oneYearTarget = Number($("*[data-test='ONE_YEAR_TARGET_PRICE-value']").text());
-          // push data from table to data array
-          const tableRowData = {
-            previousClose: previousClose,
-            open,
-            dayRange,
-            yearRange,
-            marketCap,
-            earningsDate,
-            oneYearTarget
-          };
+          let oneYearTarget = Number($("*[data-test='ONE_YEAR_TARGET_PRICE-value']").text().replace(',', ''));
           // push results to data object
           data = [
             {
@@ -203,7 +202,17 @@ app.get('/stocks/:stockId', (req, res) => {
               price,
               priceChange,
               priceChangePercent,
-              more: tableRowData
+              more: {
+                previousClose: previousClose,
+                open,
+                todayLow,
+                todayHigh,
+                yearLow,
+                yearHigh,
+                marketCap,
+                earningsDate,
+                oneYearTarget
+              }
             }
           ]
           // respond to user with data array
